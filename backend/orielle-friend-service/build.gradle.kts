@@ -1,17 +1,9 @@
-plugins {
-    kotlin("jvm")
-}
-
 group = "com.orielle"
 version = "unspecified"
 
-dependencies {
-    testImplementation(kotlin("test"))
+plugins {
+    id("buildsrc.convention.kotlin-jvm")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-kotlin {
-    jvmToolchain(21)
+dependencies {
 }

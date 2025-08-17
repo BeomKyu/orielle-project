@@ -12,4 +12,6 @@ kotlin {
 dependencies {
     // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
     implementation(libs.kotlinGradlePlugin)
+    // spring boot plugin
+//    implementation(libs.plugins.spring.boot)
 }

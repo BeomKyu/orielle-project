@@ -3,22 +3,34 @@
 package buildsrc.convention
 
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    // Apply the Kotlin JVM plugin to add support for Kotlin in JVM projects.
+    // 코틀린 JVM 플러그인을 적용합니다.
     kotlin("jvm")
 }
 
+// 모든 코틀린 JVM 모듈이 공통으로 사용할 저장소를 설정합니다.
+repositories {
+    mavenCentral()
+}
+
 kotlin {
-    // Use a specific Java version to make it easier to work in different environments.
+    // Java 21 버전을 사용하도록 툴체인을 설정합니다.
     jvmToolchain(21)
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
+
 tasks.withType<Test>().configureEach {
-    // Configure all test Gradle tasks to use JUnitPlatform.
+    // 모든 테스트 작업에 JUnit Platform을 사용하도록 설정합니다.
     useJUnitPlatform()
 
-    // Log information about all test results, not only the failed ones.
+    // 실패한 테스트뿐만 아니라 모든 테스트 결과를 로그에 출력합니다.
     testLogging {
         events(
             TestLogEvent.FAILED,
