@@ -1,23 +1,38 @@
-# orielle-project
+# Orielle Project
 
-This project uses [Gradle](https://gradle.org/).
-To build and run the application, use the *Gradle* tool window by clicking the Gradle icon in the right-hand toolbar,
-or run it directly from the terminal:
+이 프로젝트는 Spring Boot와 Kotlin WebFlux를 사용하여 구축된 리액티브 백엔드 애플리케이션입니다.
 
-* Run `./gradlew run` to build and run the application.
-* Run `./gradlew build` to only build the application.
-* Run `./gradlew check` to run all checks, including tests.
-* Run `./gradlew clean` to clean all build outputs.
+## ✨ 주요 특징
 
-Note the usage of the Gradle Wrapper (`./gradlew`).
-This is the suggested way to use Gradle in production projects.
+- **리액티브 스택**: Spring WebFlux와 코틀린 코루틴을 사용하여 비동기 및 논블로킹 방식으로 높은 성능과 확장성을 추구합니다.
+- **모던 코틀린 활용**: 코틀린의 최신 기능을 활용하여 간결하고 안전한 코드를 지향합니다.
+- **중앙화된 의존성 관리**: Gradle Version Catalog (`libs.versions.toml`)를 통해 프로젝트의 모든 의존성을 체계적으로 관리합니다.
+- **다중 모듈 구조**: `orielle-idessy-service`와 같은 하위 모듈을 통해 기능을 분리하고 확장 가능한 구조를 가집니다.
 
-[Learn more about the Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html).
+## 🛠️ 기술 스택
 
-[Learn more about Gradle tasks](https://docs.gradle.org/current/userguide/command_line_interface.html#common_tasks).
+- **Framework**: Spring Boot 3.5.4 (WebFlux)
+- **Language**: Kotlin 2.2.10
+- **Build Tool**: Gradle
+- **Asynchronous**: Kotlin Coroutines
+- **JSON**: Jackson, Kotlinx Serialization
 
-This project follows the suggested multi-module setup and consists of the `app` and `utils` subprojects.
-The shared build logic was extracted to a convention plugin located in `buildSrc`.
+## 🚀 시작하기
 
-This project uses a version catalog (see `gradle/libs.versions.toml`) to declare and version dependencies
-and both a build cache and a configuration cache (see `gradle.properties`).
+1.  **저장소 복제**
+
+    ```bash
+    git clone <repository-url>
+    ```
+
+2.  **프로젝트 빌드**
+
+    ```bash
+    ./gradlew build
+    ```
+
+3.  **애플리케이션 실행**
+
+    ```bash
+    ./gradlew :backend:orielle-idessy-service:bootRun
+    ```

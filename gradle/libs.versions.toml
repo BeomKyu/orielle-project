@@ -3,33 +3,61 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.1.20"
-kotlinxDatetime = "0.6.1"
-kotlinxSerializationJSON = "1.7.3"
-kotlinxCoroutines = "1.9.0"
+# =================================================================================
+#                                 Kotlin Versions
+# =================================================================================
+kotlin = "2.2.10" # 코틀린 컴파일러 및 기본 플러그인 버전
+kotlinxDatetime = "0.7.1" # 코틀린 공식 날짜/시간 라이브러리
+kotlinxSerializationJSON = "1.9.0" # 코틀린 공식 JSON 직렬화 라이브러리
+kotlinxCoroutines = "1.10.2" # 코틀린 공식 비동기 프로그래밍(코루틴) 라이브러리
 
-springBoot = "3.2.5"
-springDependencyManagement = "1.1.4"
+# =================================================================================
+#                               Spring Boot Versions
+# =================================================================================
+springBoot = "3.5.4" # 백엔드 애플리케이션 프레임워크
+springDependencyManagement = "1.1.7" # 의존성 라이브러리들의 버전을 관리해주는 Gradle 플러그인
 
 [libraries]
+# =================================================================================
+#                               Kotlin Libraries
+# =================================================================================
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
-kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
+kotlinxCoroutinesCore = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" } # 버전이 명확하면 생략 가능 (spring-boot-dependencies에서 관리됨)
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+# =================================================================================
+#                               Spring Boot Libraries
+# =================================================================================
+# [1] WebFlux 스타터: 비동기/리액티브 웹 애플리케이션을 위한 핵심 의존성
+springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux", version.ref = "springBoot" }
+# [2] Jackson 모듈: JSON 처리를 위해 필요한 코틀린 호환 라이브러리
+jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+# [3] Kotlin 리플렉션: Spring이 런타임에 코틀린 클래스를 분석하기 위해 필요
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+# [4] 테스트 스타터: WebFlux를 위한 리액티브 테스트 도구를 포함한 테스트 의존성
+springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 
-# Libraries can be bundled together for easier import
+# =================================================================================
+#                               Bundles (의존성 묶음)
+# =================================================================================
 [bundles]
-kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
+# 코틀린 생태계의 핵심 라이브러리 묶음
+kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerializationJson", "kotlinxCoroutinesCore"]
+# Spring Boot WebFlux 애플리케이션을 위한 핵심 의존성 묶음
+springBootWebfluxEcosystem = ["springBootStarterWebflux", "jacksonModuleKotlin", "kotlinReflect"]
 
+# =================================================================================
+#                               Plugins (Gradle 플러그인)
+# =================================================================================
 [plugins]
+# 코틀린 직렬화 컴파일러 플러그인
 kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
-spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+# Spring Boot 및 의존성 관리 플러그인
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
+
+# 코틀린 JVM 및 Spring 지원 플러그인
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
