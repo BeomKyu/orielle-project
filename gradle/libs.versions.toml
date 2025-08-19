@@ -3,6 +3,16 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
+
+# =================================================================================
+#                               General Versions
+# =================================================================================
+java = "21" # Java 버전 (JDK 21)
+javaToolchain = "21" # Gradle에서 사용할 Java Toolchain 버전
+groovy = "4.0.13" # Groovy 버전 (Gradle 스크립트 언어)
+logback = "1.4.11" # 로깅 라이브러리 버전
+slf4j = "2.0.12" # SLF4J (Simple Logging Facade for Java) 버전
+testcontainers = "18.0" # 테스트 컨테이너 라이브러리 버전 (Docker 기반 테스트 환경 구축)
 # =================================================================================
 #                                 Kotlin Versions
 # =================================================================================

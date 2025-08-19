@@ -5,8 +5,15 @@ plugins {
     `kotlin-dsl`
 }
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain {
+        // 수정된 코드
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.javaToolchain.get()))
+    }
 }
 
 dependencies {
