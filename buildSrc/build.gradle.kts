@@ -1,7 +1,4 @@
 plugins {
-    // The Kotlin DSL plugin provides a convenient way to develop convention plugins.
-    // Convention plugins are located in `src/main/kotlin`, with the file extension `.gradle.kts`,
-    // and are applied in the project's `build.gradle.kts` files as required.
     `kotlin-dsl`
 }
 
@@ -10,15 +7,11 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain {
-        // 수정된 코드
-        languageVersion.set(JavaLanguageVersion.of(libs.versions.javaToolchain.get()))
-    }
+    // 단순화: 카탈로그 파싱 제거, 고정된 JDK 21 사용
+    jvmToolchain(21)
 }
 
 dependencies {
-    // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
+    // 프리컴파일드 스크립트 플러그인에서 Kotlin Gradle Plugin 사용
     implementation(libs.kotlinGradlePlugin)
-    // spring boot plugin
-//    implementation(libs.plugins.spring.boot)
 }

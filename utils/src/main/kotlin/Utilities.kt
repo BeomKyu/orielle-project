@@ -1,13 +1,13 @@
 package com.orielle.utils
 
-import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
 import kotlinx.coroutines.*
 
 @Serializable
 class Printer(val message: String) {
     fun printMessage() = runBlocking {
-        val now: Instant = Clock.System.now()
+        // 실험 API(kotlin.time/ kotlinx.datetime) 대신 안정적인 JDK 시간 API 사용
+        val now: java.time.Instant = java.time.Instant.now()
         launch {
             delay(1000L)
             println(now.toString())
