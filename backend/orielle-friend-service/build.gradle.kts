@@ -1,9 +1,19 @@
 group = "com.orielle"
-version = "unspecified"
+version = "0.1.0"
 
 plugins {
-    id("buildsrc.convention.kotlin-jvm")
+    alias(libs.plugins.kotlinJvm)
+    alias(libs.plugins.springBoot)
+    alias(libs.plugins.springDependencyManagement)
+    alias(libs.plugins.kotlinSpring)
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
+    implementation(libs.bundles.springBootWebfluxEcosystem)
+    testImplementation(libs.springBootStarterTest)
+    testImplementation(kotlin("test"))
 }
