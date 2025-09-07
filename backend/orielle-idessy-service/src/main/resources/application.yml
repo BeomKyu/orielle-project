@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: orielle-idessy-service
+  
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/orielle_idessy
+    username: ${DB_USERNAME:orielle}
+    password: ${DB_PASSWORD:orielle123}
+  
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com.orielle.idessy: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.r2dbc: DEBUG

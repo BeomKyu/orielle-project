@@ -47,6 +47,10 @@ jacksonModuleKotlin = { module = "com.fasterxml.jackson.module:jackson-module-ko
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 # [4] 테스트 스타터: WebFlux를 위한 리액티브 테스트 도구를 포함한 테스트 의존성
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+# [5] R2DBC 스타터: 리액티브 데이터베이스 액세스를 위한 핵심 의존성
+springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc", version.ref = "springBoot" }
+# [6] PostgreSQL R2DBC 드라이버: PostgreSQL 리액티브 데이터베이스 연결 드라이버
+r2dbcPostgresql = { module = "org.postgresql:r2dbc-postgresql" }
 
 # =================================================================================
 #                               Bundles (의존성 묶음)
@@ -56,6 +60,8 @@ springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter
 kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerializationJson", "kotlinxCoroutinesCore"]
 # Spring Boot WebFlux 애플리케이션을 위한 핵심 의존성 묶음
 springBootWebfluxEcosystemInKotiln = ["springBootStarterWebflux", "jacksonModuleKotlin", "kotlinReflect"]
+# Spring Boot R2DBC 리액티브 애플리케이션을 위한 핵심 의존성 묶음
+springBootR2dbcEcosystemInKotlin = ["springBootStarterWebflux", "springBootStarterDataR2dbc", "r2dbcPostgresql", "jacksonModuleKotlin", "kotlinReflect"]
 
 # =================================================================================
 #                               Plugins (Gradle 플러그인)
@@ -71,3 +77,4 @@ springDependencyManagement = { id = "io.spring.dependency-management", version.r
 # 코틀린 JVM 및 Spring 지원 플러그인
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlinJpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
