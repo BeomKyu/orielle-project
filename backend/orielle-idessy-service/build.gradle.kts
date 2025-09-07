@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.bundles.springBootWebfluxEcosystem)
+    implementation(libs.bundles.springBootWebfluxEcosystemInKotiln)
     testImplementation(libs.springBootStarterTest)
     testImplementation(kotlin("test"))
 }

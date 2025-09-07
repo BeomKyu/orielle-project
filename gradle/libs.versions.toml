@@ -55,7 +55,7 @@ springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter
 # 코틀린 생태계의 핵심 라이브러리 묶음
 kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerializationJson", "kotlinxCoroutinesCore"]
 # Spring Boot WebFlux 애플리케이션을 위한 핵심 의존성 묶음
-springBootWebfluxEcosystem = ["springBootStarterWebflux", "jacksonModuleKotlin", "kotlinReflect"]
+springBootWebfluxEcosystemInKotiln = ["springBootStarterWebflux", "jacksonModuleKotlin", "kotlinReflect"]
 
 # =================================================================================
 #                               Plugins (Gradle 플러그인)
