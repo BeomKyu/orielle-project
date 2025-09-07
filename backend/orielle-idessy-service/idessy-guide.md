@@ -1,117 +1,156 @@
-# 🚀 Idessy-Service 개발 시작 가이드 (v2.1 - R2DBC 리액티브 적용)
+# 🚀 Idessy-Service 개발 가이드 (v2.2 - 최종 설계 반영)
 
 ## 🎯 1. 핵심 목표
 
 `idessy-service`는 Orielle의 가장 독창적인 개념인 **'데이터 주권'**을 기술적으로 구현하는 핵심 서비스입니다. 이 서비스는 **Spring WebFlux**를 기반으로 하므로, 데이터베이스 접근 역시 완전한 논블로킹(Non-Blocking) 방식인 **R2DBC**를 사용하여 구현합니다.
 
+이 문서는 프로젝트의 최신 코드와 '최종 통합 설계서'를 모두 반영한 **단일 진실 공급원(Single Source of Truth)** 역할을 합니다.
+
 ## ✅ 2. 개발 로드맵
 
-### 1단계: R2DBC 의존성 추가
+### 1단계: R2DBC 의존성 확인
 
-먼저 `build.gradle.kts` 파일에 Spring Data R2DBC와 PostgreSQL용 R2DBC 드라이버 의존성을 추가합니다.
+`build.gradle.kts` 파일에 Spring Data R2DBC와 PostgreSQL용 R2DBC 드라이버 의존성이 올바르게 포함되어 있는지 확인합니다. `libs.versions.toml`의 `springBootR2dbcEcosystemInKotlin` 번들을 사용하는 것이 좋습니다.
 
 ```kotlin
-// build.gradle.kts
+// backend/orielle-idessy-service/build.gradle.kts
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("org.postgresql:r2dbc-postgresql")
-    // ... 기존 WebFlux 의존성
+    // springBootStarterWebflux, springBootStarterDataR2dbc, r2dbcPostgresql 등이 포함됨
+    implementation(libs.bundles.springBootR2dbcEcosystemInKotlin)
+    // ...
 }
 ```
 
-### 2단계: 데이터 모델 (Entity) 구현
+### 2단계: 데이터 모델 (Entity) 최종 확정
 
-'최종 통합 설계서'에 명시된 3개의 핵심 테이블을 Spring Data R2DBC에 맞게 재정의합니다.
+'최종 통합 설계서'와 최신 코드를 비교하여 빠진 필드를 모두 추가한 최종 엔티티 모델입니다.
 
 #### Entity 1: `Idessy` (핵심 페르소나)
+* `description`, `anonymousId`, `isActive` 필드를 추가하여 설계를 완성했습니다.
 
 ```kotlin
+// src/main/kotlin/com/orielle/entity/Idessy.kt
+package com.orielle.entity
+
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
+import java.util.*
 
-@Table("idessys") // JPA의 @Entity 대신 @Table 사용
+@Table("idessys")
 data class Idessy(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    // 'PERSONAL' 또는 'GROUP'
-    val type: String,
+    // Keycloak의 User ID와 연결됩니다.
+    val userId: UUID,
 
-    // Keycloak의 User ID를 참조 ('PERSONAL' 또는 'CORPORATE' User)
-    val keycloakUserId: String,
+    val type: IdessyType, // PERSONAL or GROUP
 
-    val name: String,               // 페르소나 이름
-    val description: String?,       // 설명
-    val anonymousId: String,        // 외부 서비스에 노출될 익명 ID
-    val isActive: Boolean = true,   // 활성화 여부
-    val createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime
+    var displayName: String,
+    
+    var description: String? = null, // Idessy 설명
+
+    val anonymousId: String, // 외부 서비스에 노출될 익명 ID
+
+    var isActive: Boolean = true, // Idessy 활성화/비활성화 상태
+
+    var profileImageUrl: String? = null,
+
+    var anonymousEmail: String? = null,
+
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime = LocalDateTime.now()
 )
+
+enum class IdessyType {
+    PERSONAL,
+    GROUP
+}
 ```
 
 #### Entity 2: `GroupMembership` (그룹 멤버)
+* 기존 코드가 이미 완벽하여 그대로 유지합니다. `role` 필드에 `GroupRole` Enum을 사용한 것이 좋습니다.
 
 ```kotlin
+// src/main/kotlin/com/orielle/entity/GroupMembership.kt
+package com.orielle.entity
+
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
+import java.util.*
 
 @Table("group_memberships")
 data class GroupMembership(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    // 어느 그룹에 속해 있는지 (Group Idessy의 ID)
     val groupIdessyId: UUID,
-
-    // 어떤 멤버가 속해 있는지 (Personal Idessy의 ID)
     val memberIdessyId: UUID,
+    
+    var role: GroupRole, // ADMIN or MEMBER
 
-    // 그룹 내에서의 역할 (예: 'admin', 'member')
-    val role: String,
-
-    val joinedAt: LocalDateTime
+    val joinedAt: LocalDateTime = LocalDateTime.now()
 )
+
+enum class GroupRole {
+    ADMIN,
+    MEMBER
+}
 ```
 
 #### Entity 3: `CorporateRepresentative` (법적 대표자)
+* 설계서에 명시된 `role` 필드를 추가하여 법적 대표자의 권한을 명시하도록 수정했습니다.
 
 ```kotlin
+// src/main/kotlin/com/orielle/entity/CorporateRepresentative.kt
+package com.orielle.entity
+
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
+import java.util.*
 
 @Table("corporate_representatives")
 data class CorporateRepresentative(
     @Id
     val id: UUID = UUID.randomUUID(),
 
-    // 법인격 User (Keycloak의 Corporate User ID)
-    val corporateUserId: String,
+    // 그룹 Idessy에 연결된 Corporate User의 ID
+    val corporateUserId: UUID,
 
-    // 법적 대표자 User (Keycloak의 Personal User ID)
-    val representativeUserId: String,
+    // 법적 대표자인 Personal User의 ID
+    val personalUserId: UUID,
+    
+    var role: String, // 예: "OWNER", "ADMIN" 등
 
-    // 권한 (예: 'owner', 'admin')
-    val role: String,
-
-    val assignedAt: LocalDateTime
+    val appointedAt: LocalDateTime = LocalDateTime.now()
 )
 ```
 
 ### 3단계: 리액티브 리포지토리(Repository) 구현
 
-JPA의 `JpaRepository` 대신, R2DBC의 `ReactiveCrudRepository`를 상속받아 리포지토리를 구현합니다. 모든 메서드는 `Mono` 또는 `Flux`를 반환합니다.
+R2DBC의 `ReactiveCrudRepository`를 상속받아 각 엔티티에 맞는 리포지토리를 구현합니다.
 
 ```kotlin
-import org.springframework.data.repository.reactive.ReactiveCrudRepository
-import reactor.core.publisher.Flux
-import java.util.UUID
-
+// IdessyRepository.kt
 interface IdessyRepository : ReactiveCrudRepository<Idessy, UUID> {
-    fun findByKeycloakUserId(keycloakUserId: String): Flux<Idessy>
+    fun findByUserId(userId: UUID): Flux<Idessy>
+}
+
+// GroupMembershipRepository.kt
+interface GroupMembershipRepository : ReactiveCrudRepository<GroupMembership, UUID> {
+    fun findByGroupIdessyId(groupIdessyId: UUID): Flux<GroupMembership>
+}
+
+// CorporateRepresentativeRepository.kt
+interface CorporateRepresentativeRepository : ReactiveCrudRepository<CorporateRepresentative, UUID> {
+    fun findByCorporateUserId(corporateUserId: UUID): Flux<CorporateRepresentative>
 }
 ```
 
-### 4단계: `GROUP` 타입 Idessy 생성 로직 구현 (리액티브 파이프라인)
+### 4단계: `GROUP` 타입 Idessy 생성 로직 (리액티브 파이프라인)
 
 `POST /api/idessy` 요청 시, `type`이 `'GROUP'`인 경우의 로직을 `Mono`와 `Flux`를 사용한 리액티브 파이프라인으로 구성합니다.
 
@@ -122,23 +161,12 @@ interface IdessyRepository : ReactiveCrudRepository<Idessy, UUID> {
 
 ### 5단계: REST API 엔드포인트 개발 (WebFlux)
 
-컨트롤러의 모든 API는 `Mono`와 `Flux`를 반환 타입으로 사용해야 합니다.
+컨트롤러의 모든 API는 `Mono`와 `Flux`를 반환 타입으로 사용하여 완전한 리액티브 스택을 유지합니다.
 
 ```kotlin
 @RestController
 @RequestMapping("/api/idessy")
 class IdessyController(private val idessyRepository: IdessyRepository) {
-
-    @PostMapping
-    fun createIdessy(@RequestBody idessy: Idessy): Mono<Idessy> {
-        // ... 리액티브 생성 로직
-    }
-
-    @GetMapping("/my")
-    fun getMyIdessies(@RequestParam keycloakUserId: String): Flux<Idessy> {
-        return idessyRepository.findByKeycloakUserId(keycloakUserId)
-    }
-
-    // ... 기타 API
+    // ... API 구현
 }
 ```
