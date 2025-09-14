@@ -1,13 +1,13 @@
-# Common Module (utils) Design Document
+# Utils (Common) Module Design Document
 
-- **Version**: 1.0
+- **Version**: 1.2 (Final)
 - **Author**: BeomKyu, Orielle 프로젝트 컨설턴트
-- **Status**: DRAFT
+- **Status**: FINALIZED
 
 ## 1. 모듈 개요
 Utils Module(`orielle-project/utils`)은 Orielle 플랫폼의 모든 마이크로서비스가 공유하는 **'공통 건축 표준 설계도'** 역할을 수행합니다. 코드 중복을 제거하고, 개발 경험(DX)을 향상시키며, 플랫폼 전체의 기술적 일관성을 유지하는 것을 목표로 합니다.
 
-이 모듈은 Orielle의 보안 모델에 따라 **내부 서비스용(`utils-internal`)**과 **외부 개발자용(`utils-sdk`)**으로 명확히 구분하여 개발 및 배포되어야 합니다.
+이 모듈은 Orielle의 보안 모델에 따라 **내부 서비스용(`internal`)**과 **외부 개발자용(`sdk`)**으로 명확히 구분하여 개발 및 배포되어야 합니다.
 
 ## 2. 모듈 구조
 - **`orielle-utils-internal` (내부 서비스 전용)**: Orielle의 모든 내부 서비스(IdessyService, FriendService 등)가 사용하는 '완전판' 라이브러리입니다. 외부로 노출되어서는 안 되는 민감한 로직과 내부 서비스 간의 상호작용에 필요한 모든 유틸리티를 포함합니다.
@@ -17,9 +17,9 @@ Utils Module(`orielle-project/utils`)은 Orielle 플랫폼의 모든 마이크�
 
 ### 3.1. 도메인 공통 요소 (Domain Commons)
 - **`Enums`**: 플랫폼 전반에서 사용되는 타입이나 역할을 정의하여 타입 안전성을 확보합니다.
-    - 예: `IdessyType`, `GroupRole`
+  - 예: `IdessyType`, `GroupRole`
 - **`Constants`**: 공통으로 사용되는 상수 값들을 관리합니다.
-    - 예: `TOKEN_ISSUER = "orielle.com"`, `HEADER_ORIELLE_REQUEST_ID = "X-Orielle-Request-Id"`
+  - 예: `TOKEN_ISSUER = "orielle.com"`, `HEADER_ORIELLE_REQUEST_ID = "X-Orielle-Request-Id"`
 - **`DTOs (Data Transfer Objects)`**: 표준 API 응답 형식(`ApiResponse`, `ApiError`)과 같이 여러 서비스에서 공통으로 사용되는 데이터 객체를 정의합니다.
 
 ### 3.2. 애플리케이션 유틸리티 (Application Utilities)
@@ -29,11 +29,11 @@ Utils Module(`orielle-project/utils`)은 Orielle 플랫폼의 모든 마이크�
 
 ### 3.3. 보안 관련 (Security)
 - **`utils-sdk` (외부용)**:
-    - **기능**: 외부 Realm이 받은 **'익명 토큰'**의 서명을 검증하는 기능만 제공합니다.
-    - **의존성**: `java-jwt` 등 가벼운 JWT 라이브러리. **Spring Security 미포함.**
+  - **기능**: 외부 Realm이 받은 **'익명 토큰'**의 서명을 검증하는 기능만 제공합니다.
+  - **의존성**: `java-jwt` 등 가벼운 JWT 라이브러리. **Spring Security 미포함.**
 - **`utils-internal` (내부용)**:
-    - **기능**: Spring Security와 통합되어, Controller에서 `@AuthenticationPrincipal` 등으로 토큰 정보를 쉽게 주입받을 수 있도록 설정합니다. 또한 `sub` (idessy_id), `own` (user_id) 등 Orielle의 커스텀 클레임을 파싱하는 유틸리티를 제공합니다.
-    - **의존성**: **Spring Security 필수 포함.**
+  - **기능**: Spring Security와 통합되어, Controller에서 `@AuthenticationPrincipal` 등으로 토큰 정보를 쉽게 주입받을 수 있도록 설정합니다. 또한 `sub` (idessy_id), `own` (user_id) 등 Orielle의 커스텀 클레임을 파싱하는 유틸리티를 제공합니다.
+  - **의존성**: **Spring Security 필수 포함.**
 
 ### 3.4. 인프라 유틸리티 (Infrastructure Utilities)
 - **`Logging`**: 모든 마이크로서비스가 일관된 JSON 포맷으로 로그를 남기도록 `Logback` 설정을 제공하거나, `MDC(Mapped Diagnostic Context)`에 요청 ID 등을 자동으로 추가하는 필터 구현을 제공합니다.
