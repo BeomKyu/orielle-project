@@ -20,4 +20,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
     // Version Catalog는 기본 위치 gradle/libs.versions.toml을 자동 사용
-}
+}include("backend:orielle-account-service")
+include("backend:orielle-notification-service")
